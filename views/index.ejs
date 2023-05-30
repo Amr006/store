@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="./index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+</head>
+
+<body>
+
+
+  <p class="text-center background">ملاحظة : يتم احتساب الشحن بالدولار الامريكي او ما يعادلها من عملات حسب سعر الصرف
+    المحلى .</p>
+
+  <div class="container">
+
+
+    <table id="table">
+      <thead class="background">
+        <tr>
+          <td>اسم المادة</td>
+          <td>تكلفة الشحن</td>
+          <td>وقت التحديث</td>
+
+        </tr>
+      </thead>
+      <tbody id="products">
+
+        <tr data-index="0">
+          <td> <span> name </span> <input class="checkbox" type="checkbox" checked=""></td>
+          <td class="price">1.40</td>
+          <td class="time">19 : 7 : 33 : PM</td>
+        </tr>
+
+      </tbody>
+    </table>
+    <div class="info">
+
+      <div class="flex">
+        <div class="showinfo">
+          <h3 class="text-center">ملخص الاسعار</h3>
+          <div class="highprice" id="highprice">
+            <span>اعلى سعر</span>
+            <span class="span"> </span>
+            <span class="name"> </span>
+          </div>
+          <div class="lowprice" id="lowprice">
+            <span>اقل سعر</span>
+            <span class="span"> </span>
+            <span class="name"> </span>
+          </div>
+          <div class="average" id="average">
+            <span>متوسط الاسعار</span>
+            <span class="span"> </span>
+            <span class="name"> </span>
+          </div>
+        </div>
+        <div class="setandupdate">
+          <h3 class="text-center"> نسبة التغيير</h3>
+          <div class="maxhigh">
+            <span>اعلى قيمة</span>
+            <input id="max" min="0" type="number" step="0.01" />
+          </div>
+          <div class="minhigh">
+            <span>اقل قيمة</span>
+            <input id="min" min="0" type="number" step="0.01" />
+          </div>
+          <button id="editandtriggerthefunction">تعديل</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="updateprice" id="updateprice" style="display: none;">
+      <h3 class="text-center">تعديل المادة</h3>
+      <input type="hidden" id="id" />
+      <input type="text" id="name" value="" />
+      <input type="number" step="0.01" id="price" value="" />
+      <button style="cursor: pointer;" id="updatevalue">عدل السلعة</button>
+
+    </div>
+
+  </div>
+  <!-- <button id="printButton">Print Section</button> -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+
+
+
+
+  <script>
+
+    let data = <%- JSON.stringify(data) %>;
+
+    products = document.getElementById('products');
+    highprice = document.getElementById('highprice');
+    lowprice = document.getElementById('lowprice');
+    average = document.getElementById('average');
+    products.innerHTML = "";
+    let maxPrice = 0.001;
+    let minPrice = 999999999.99;
+    let maxname
+    let minname
+    let avgPrice = 0;
+    let total = 0;
+
+
+
+    for (let i = 0; i < data.length; i++) {
+
+      products.innerHTML += `
+        
+        <tr data-index="${i}">
+            <td> <span> ${data[i].name} </span> <input class="checkbox" type="checkbox" checked=""></td>
+            <td class="price">${data[i].price}</td>
+            <td class="time">${data[i].date}</td>
+        </tr>
+        
+        ` ;
+
+      if (parseFloat(data[i].price) >= maxPrice) {
+        if (parseFloat(data[i].price) == maxPrice) {
+          maxname = maxname + " , " + data[i].name;
+        } else {
+          maxPrice = parseFloat(data[i].price);
+          maxname = data[i].name;
+        }
+      }
+      if (parseFloat(data[i].price) <= minPrice) {
+        if (parseFloat(data[i].price) == minPrice) {
+          minname = minname + " , " + data[i].name;
+        }
+        minPrice = parseFloat(data[i].price);
+        minname = data[i].name;
+      }
+      total += parseFloat(data[i].price);
+    }
+    avgPrice = total / data.length;
+    // Perform further operations with the JSON data
+
+    highprice.innerHTML = "";
+    highprice.innerHTML = `
+  <span>اعلى سعر</span>
+  <span class="span"> ${maxPrice}</span>
+  <span class="name"> ${maxname}</span>`;
+
+    lowprice.innerHTML = ``;
+    lowprice.innerHTML = `
+    <span>اقل سعر</span>
+    <span class="span">${minPrice}</span>
+    <span class="name">${minname}</span>
+    `;
+
+    average.innerHTML = ``;
+    average.innerHTML = `
+        <span>متوسط الاسعار</span>
+        <span class="span">${avgPrice.toFixed(2)} </span>
+        <span class="name"></span>
+    `;
+    // change in json file 
+    let AllCheckboxs = document.getElementsByClassName("checkbox");
+    for (let i = 0; i < AllCheckboxs.length; i++) {
+
+      AllCheckboxs[i].addEventListener('click', function (event) {
+        console.log("amr")
+        data[i].state = !data[i].state
+        console.log(data[i].state);
+      })
+    }
+
+    let Allprices = document.getElementsByClassName("price");
+
+    for (let i = 0; i < Allprices.length; i++) {
+
+      Allprices[i].addEventListener('click', function () {
+        // data[i].price = // new price ;
+        
+        if (document.getElementById("updateprice").style.display == "none") {
+          document.getElementById("updateprice").style.display = "";
+          document.getElementById("name").value = data[i].name;
+          document.getElementById("price").value = data[i].price;
+          document.getElementById("updatevalue").addEventListener("click", () => {
+            data[i].name = document.getElementById("name").value;
+            data[i].price = document.getElementById("price").value;
+            console.log(data)
+            fetch('/save', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(data)
+            })
+              .then(response => response.json())
+              .then(responseData => {
+                console.log(responseData);
+                
+              })
+              .catch(error => {
+                console.error('Error:', error);
+              });
+            alert("تم التعديل") ;
+            window.location.reload();
+          })
+        }
+
+      })
+    }
+
+
+
+
+
+  </script>
+
+</body>
+
+</html>
